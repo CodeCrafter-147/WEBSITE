@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>SR WorkRoom • Room</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0c10; --surface:#121317; --surface-2:#17181e;
+    --text:#fff; --sub:#cfd3da; --accent:#00f2fe; --accent-2:#8a2be2;
+    --warn:#ff6b6b; --ok:#00e5a8; --line:#242836; --glow:0 0 30px rgba(0,242,254,.25); --radius:14px;
+  }
+  *{box-sizing:border-box} html,body{margin:0}
+  body{
+    font-family:'Prompt',sans-serif;
+    background: radial-gradient(1200px 600px at 10% -10%, #1b2b34 0%, transparent 60%),
+                radial-gradient(900px 600px at 100% 0%, #241b3a 0%, transparent 55%),
+                var(--bg);
+    color:var(--text); min-height:100vh;
+  }
+
+  /* Top nav */
+  .nav{position:sticky; top:0; z-index:50; backdrop-filter:blur(8px);
+    background:linear-gradient(180deg,rgba(15,15,18,.85),rgba(15,15,18,.55));
+    border-bottom:1px solid #22262e;}
+  .nav-wrap{max-width:1200px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+  .badge{border:2px solid var(--accent);border-radius:10px;padding:6px 10px;background:linear-gradient(90deg,#00f2fe22,#8a2be222);box-shadow:var(--glow)}
+  .btn{appearance:none;border:none;cursor:pointer;font-weight:600;padding:10px 14px;border-radius:10px;transition:.25s}
+  .btn.primary{color:#000;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+  .btn.ghost{background:transparent;color:var(--sub);border:1px solid #2a2f38}
+  .btn.ghost:hover{border-color:#3a404b;color:#fff}
+  .btn.warn{background:var(--warn); color:#000}
+  .btn.ok{color:#000;background:linear-gradient(90deg,var(--ok),#67ffd4)}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#aeb4bf;padding:6px 10px;border-radius:999px;border:1px solid #2b2f39;background:#171921}
+
+  /* Hero */
+  .hero{max-width:1200px;margin:0 auto;padding:26px 20px 10px}
+  .banner{position:relative;overflow:hidden;border-radius:var(--radius);
+    border:1px solid var(--line);background:#0f1014}
+  .banner-img{height:220px;background-size:cover;background-position:center}
+  .banner-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.25),rgba(0,0,0,.55))}
+  .banner-info{position:absolute;left:24px;bottom:18px}
+  .banner-info h1{margin:0 0 6px;font-size:28px}
+  .banner-info p{margin:0;color:#cfd3da}
+  .banner-actions{position:absolute;right:16px;bottom:16px;display:none;gap:8px;flex-wrap:wrap}
+
+  /* Tabs */
+  .tabs{max-width:1200px;margin:10px auto 0;padding:0 20px;display:flex;gap:8px;border-bottom:1px solid #20242f;flex-wrap:wrap}
+  .tab{background:transparent;color:#aeb4bf;border:none;padding:14px 16px;cursor:pointer;border-bottom:2px solid transparent;border-radius:8px 8px 0 0}
+  .tab:hover{color:#fff}
+  .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+  /* Content */
+  .content{max-width:1200px;margin:0 auto;padding:24px 20px 60px}
+  .grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+  .two{display:grid;gap:18px}
+  @media(min-width:980px){.two{grid-template-columns:380px 1fr}}
+  .card{background: linear-gradient(180deg, var(--surface-2), var(--surface));
+    border:1px solid var(--line); border-radius:var(--radius); padding:18px; transition:.25s}
+  .card:hover{transform:translateY(-2px); box-shadow:var(--glow)}
+  .muted{color:#9aa3b2;font-size:14px}
+  .small{font-size:12px;color:#9aa3b2}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .field{width:100%}
+  input[type="text"],input[type="date"],textarea,select{
+    width:100%;padding:10px 12px;border-radius:10px;border:1px solid #2b2f39;background:#131722;color:#fff
+  }
+  textarea{min-height:100px}
+
+  /* Board (Project) */
+  .board{display:grid;gap:14px}
+  @media(min-width:980px){.board{grid-template-columns:repeat(4,1fr)}}
+  .col{background:#121722;border:1px solid #232734;border-radius:12px;padding:12px;min-height:200px}
+  .col h4{margin:0 0 8px}
+  .tcard{background:#0f141b;border:1px solid #2b2f39;border-radius:10px;padding:8px 10px;margin:8px 0}
+
+  /* Lessons (Learning) */
+  .lesson{background:#0f141b;border:1px solid #2b2f39;border-radius:10px;padding:10px;margin:6px 0}
+  .grade-row{display:grid;grid-template-columns:1.2fr 1fr 120px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px dashed #2b2f39}
+
+  /* Modal */
+  .backdrop{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; z-index:100;}
+  .modal{width:100%; max-width:460px; background:linear-gradient(180deg,var(--surface-2),var(--surface)); border:1px solid var(--line); border-radius:16px; padding:18px;}
+  .modal h3{margin:0 0 10px}
+</style>
+</head>
+<body>
+
+<!-- Top -->
+<header class="nav">
+  <div class="nav-wrap">
+    <div class="badge">SR WorkRoom</div>
+    <div class="row">
+      <span class="chip">ห้อง: <strong id="chipRoom">-</strong></span>
+      <span class="chip">ประเภท: <strong id="chipType">-</strong></span>
+      <button class="btn ghost" onclick="location.href='dashboard.html'">แดชบอร์ด</button>
+    </div>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="banner">
+    <div id="bannerImg" class="banner-img"></div>
+    <div class="banner-overlay"></div>
+    <div class="banner-info">
+      <h1 id="roomName">Room</h1>
+      <p id="roomDesc">รายละเอียด</p>
+      <div class="small">สถานะของคุณ: <span id="roleText">—</span></div>
+    </div>
+    <div class="banner-actions" id="bannerActions">
+      <input type="file" id="bannerInput" accept="image/*" style="display:none">
+      <button class="btn ghost" id="codeBtn">Room Code</button>
+      <button class="btn ghost" id="changeBanner">เปลี่ยนภาพห้อง</button>
+      <button class="btn warn"  id="delBtn">ลบห้อง</button>
+    </div>
+  </div>
+</section>
+
+<!-- Tabs (dynamic by type) -->
+<nav class="tabs" id="tabs"></nav>
+
+<!-- Content -->
+<main class="content">
+
+  <!-- STREAM -->
+  <div id="panel-stream" class="panel">
+    <div class="grid">
+      <div class="card">
+        <h3>📢 ยินดีต้อนรับ</h3>
+        <p class="muted">ประกาศ/อัปเดตล่าสุดของห้องจะอยู่ที่นี่</p>
+      </div>
+      <div class="card" id="cardQuick">
+        <h3>เริ่มต้นอย่างรวดเร็ว</h3>
+        <div id="quickGuide" class="muted"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WORK: CHECKLIST + ASSIGNMENTS -->
+  <div id="panel-checklist" style="display:none">
+    <div class="two">
+      <div class="card">
+        <h3>เช็กลิสต์งานย่อย</h3>
+        <div class="row">
+          <input id="chkText" type="text" placeholder="เพิ่มรายการ (เช่น โทรหาลูกค้า A)">
+          <button class="btn primary" onclick="addCheck()">เพิ่ม</button>
+        </div>
+        <div id="chkList" style="margin-top:10px"></div>
+      </div>
+      <div class="card">
+        <h3>งานทั้งหมด (Assignments)</h3>
+        <div id="assignList_work"></div>
+        <div id="hostBlock_work" style="display:none;margin-top:12px">
+          <div class="field"><input id="aTitle_w" type="text" placeholder="ชื่องาน *"></div>
+          <div class="field"><textarea id="aDetail_w" placeholder="รายละเอียดงาน *"></textarea></div>
+          <div class="row">
+            <div class="field" style="flex:1"><label class="small">กำหนดส่ง *</label><input id="aDue_w" type="date"></div>
+            <div class="field" style="flex:1"><input id="aAttach_w" type="text" placeholder="แนบลิงก์ (URL)"></div>
+          </div>
+          <button class="btn primary" onclick="addAssignment('work')">+ เพิ่มงาน</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECT: OVERVIEW + BOARD -->
+  <div id="panel-project" style="display:none">
+    <div class="card">
+      <h3>ภาพรวมโปรเจกต์</h3>
+      <div class="row">
+        <input id="goal" type="text" placeholder="เป้าหมายหลักของโปรเจกต์ (เช่น ส่งมอบเวอร์ชัน 1.0)">
+        <input id="milestone" type="text" placeholder="ไมล์สโตนถัดไป (เช่น Code Freeze 30/09)">
+        <button class="btn ghost" onclick="saveProjectInfo()">บันทึก</button>
+      </div>
+      <div class="small" id="goalView" style="margin-top:8px;color:#aeb4bf"></div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <h3>บอร์ดงาน</h3>
+      <div class="row" style="margin-bottom:8px">
+        <input id="taskTitle" type="text" placeholder="หัวข้องาน">
+        <select id="taskCol">
+          <option value="todo">To‑Do</option>
+          <option value="doing">Doing</option>
+          <option value="review">Review</option>
+          <option value="done">Done</option>
+        </select>
+        <button class="btn primary" onclick="addBoardTask()">+ เพิ่มการ์ด</button>
+      </div>
+      <div class="board">
+        <div class="col"><h4>To‑Do</h4><div id="col_todo"></div></div>
+        <div class="col"><h4>Doing</h4><div id="col_doing"></div></div>
+        <div class="col"><h4>Review</h4><div id="col_review"></div></div>
+        <div class="col"><h4>Done</h4><div id="col_done"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEARNING: LESSONS + ASSIGN + GRADES -->
+  <div id="panel-learning" style="display:none">
+    <div class="two">
+      <div class="card">
+        <h3>บทเรียน / แหล่งเรียนรู้</h3>
+        <div id="lessons"></div>
+        <div id="hostLessons" style="display:none;margin-top:12px">
+          <div class="field"><input id="lessonTitle" type="text" placeholder="หัวข้อบทเรียน *"></div>
+          <div class="field"><input id="lessonUrl" type="text" placeholder="ลิงก์ไฟล์/วิดีโอ/สไลด์ (URL) *"></div>
+          <button class="btn primary" onclick="addLesson()">+ เพิ่มบทเรียน</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3>งาน / แบบฝึกหัด</h3>
+        <div id="assignList_learn"></div>
+        <div id="hostBlock_learn" style="display:none;margin-top:12px">
+          <div class="field"><input id="aTitle_l" type="text" placeholder="ชื่องาน *"></div>
+          <div class="field"><textarea id="aDetail_l" placeholder="รายละเอียดงาน *"></textarea></div>
+          <div class="row">
+            <div class="field" style="flex:1"><label class="small">กำหนดส่ง *</label><input id="aDue_l" type="date"></div>
+            <div class="field" style="flex:1"><input id="aAttach_l" type="text" placeholder="แนบลิงก์ (URL)"></div>
+          </div>
+          <button class="btn primary" onclick="addAssignment('learn')">+ เพิ่มงาน</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <h3>คะแนน (อย่างย่อ)</h3>
+      <div class="small">Host กรอกคะแนนให้ผู้ส่งงาน (แสดงผลเฉพาะผู้ใช้)</div>
+      <div id="gradeTable" style="margin-top:10px"></div>
+    </div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div id="panel-calendar" style="display:none">
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <h3 style="margin:0">📅 สัปดาห์นี้</h3>
+        <div class="row">
+          <input type="date" id="weekAnchor" class="chip" title="เลือกวันอ้างอิงในสัปดาห์">
+          <button class="btn ghost" onclick="setThisWeek()">สัปดาห์ปัจจุบัน</button>
+        </div>
+      </div>
+      <div class="grid" id="weekGrid" style="grid-template-columns:repeat(7,1fr);margin-top:12px"></div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <h3>เพิ่ม Event ของฉัน</h3>
+      <div class="row">
+        <input id="evTitle" type="text" placeholder="ชื่อ Event" style="flex:2">
+        <input id="evDate" type="date" style="flex:1">
+        <button class="btn primary" onclick="addEvent()">เพิ่ม Event</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEMBERS -->
+  <div id="panel-members" style="display:none">
+    <div class="card">
+      <h3>สมาชิกในห้อง</h3>
+      <div id="memberList"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- MODAL: ROOM CODE -->
+<div id="codeModal" class="backdrop">
+  <div class="modal">
+    <h3>Room Code</h3>
+    <div class="row">
+      <input id="codeInput" type="text" style="flex:1" readonly>
+      <button class="btn ok" onclick="copyCode()">คัดลอก</button>
+    </div>
+    <div id="codeHint" class="small" style="margin-top:8px;color:#9aa3b2"></div>
+    <div class="row" id="codeHostRow" style="margin-top:12px;display:none">
+      <input id="codeEdit" type="text" placeholder="กำหนดโค้ดใหม่ (A‑Z/0‑9 4–10 ตัว)" style="flex:1">
+      <button class="btn primary" onclick="saveNewCode()">บันทึกโค้ด</button>
+    </div>
+    <div class="row" style="justify-content:flex-end;margin-top:12px">
+      <button class="btn ghost" onclick="closeCode()">ปิด</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== Base state & helpers ===== */
+const room = JSON.parse(localStorage.getItem('lastRoom')||'null') || {};
+const roomId = room.name || 'room';
+const type   = room.type || 'งานทั่วไป';
+const isHost = room.role === 'host';
+const user   = localStorage.getItem('currentUser') || 'me';
+
+const K_ASSIGN = `assignments_${roomId}`;
+const K_EVENTS = `events_${roomId}`;
+const K_MEMBERS= `members_${roomId}`;
+const K_BANNER = `banner_${roomId}`;
+const K_BOARD  = `board_${roomId}`;
+const K_LESSON = `lessons_${roomId}`;
+const K_CHECK  = `checklist_${roomId}`;
+const K_PROJ   = `project_${roomId}`; // goal/milestone
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', "'":'&#39;'}[m]));
+const today = new Date().toISOString().slice(0,10);
+
+/* ===== Header & Banner ===== */
+$('chipRoom').textContent = roomId;
+$('chipType').textContent = type;
+$('roomName').textContent = room.name || 'Room';
+$('roomDesc').textContent = room.detail || 'ไม่มีรายละเอียด';
+$('roleText').textContent = isHost ? 'HOST' : 'MEMBER';
+
+const bannerDefault = type === 'โปรเจกต์'
+  ? 'https://source.unsplash.com/1600x400/?project,team,planning'
+  : type === 'เรียนรู้'
+    ? 'https://source.unsplash.com/1600x400/?learning,study,lecture'
+    : 'https://source.unsplash.com/1600x400/?workspace,office,work';
+
+const savedBanner = localStorage.getItem(K_BANNER);
+$('bannerImg').style.backgroundImage = `url('${savedBanner || bannerDefault}')`;
+
+if(isHost){
+  $('bannerActions').style.display = 'flex';
+  $('changeBanner').onclick = ()=> $('bannerInput').click();
+  $('bannerInput').onchange = e=>{
+    const f = e.target.files[0]; if(!f) return;
+    const r = new FileReader();
+    r.onload = ()=>{ localStorage.setItem(K_BANNER, r.result); $('bannerImg').style.backgroundImage = `url('${r.result}')`; };
+    r.readAsDataURL(f);
+  };
+}
+
+/* ===== Tabs by type ===== */
+const tabsMap = {
+  'งานทั่วไป': [
+    ['stream','สตรีม'],
+    ['checklist','เช็กลิสต์/งาน'],
+    ['calendar','ตารางเวลา'],
+    ['members','สมาชิก']
+  ],
+  'โปรเจกต์': [
+    ['project','โปรเจกต์'],
+    ['calendar','ตารางเวลา'],
+    ['members','สมาชิก']
+  ],
+  'เรียนรู้': [
+    ['stream','สตรีม'],
+    ['learning','บทเรียน/งาน'],
+    ['calendar','ตารางเวลา'],
+    ['members','สมาชิก']
+  ]
+};
+const tabs = tabsMap[type] || tabsMap['งานทั่วไป'];
+$('tabs').innerHTML = tabs.map(([id,label],i)=>`<button class="tab ${i===0?'active':''}" id="tab-${id}" onclick="switchTab('${id}')">${label}</button>`).join('');
+function switchTab(id){
+  ['stream','checklist','project','learning','calendar','members'].forEach(pid=>{ const el=$('panel-'+pid); if(el) el.style.display='none'; });
+  $('panel-'+id)?.style && ($('panel-'+id).style.display='block');
+  tabs.forEach(([tid])=> $('tab-'+tid)?.classList.remove('active'));
+  $('tab-'+id)?.classList.add('active');
+}
+switchTab(tabs[0][0]);
+
+/* ===== Quick guide ===== */
+$('quickGuide').innerHTML =
+  type==='โปรเจกต์'
+    ? 'ไปที่แท็บ “โปรเจกต์” เพื่อกำหนดเป้าหมายและบริหารบอร์ดงาน (To‑Do/Doing/Review/Done)'
+    : type==='เรียนรู้'
+      ? 'ดูสื่อ/บทเรียนในแท็บ “บทเรียน/งาน” สร้าง/ส่งงาน และดูคะแนน'
+      : 'เพิ่มงานเร็วและทำเช็กลิสต์งานย่อยในแท็บ “เช็กลิสต์/งาน”';
+
+/* ===== Members ===== */
+let members = JSON.parse(localStorage.getItem(K_MEMBERS)||'null') || (isHost? [{name:user,role:'host'}] : [{name:user,role:'member'}]);
+localStorage.setItem(K_MEMBERS, JSON.stringify(members));
+function renderMembers(){
+  $('memberList').innerHTML = members.map((m,i)=>`
+    <div class="row" style="justify-content:space-between;border-bottom:1px dashed #2b2f39;padding:8px 0">
+      <div><strong>${esc(m.name)}</strong> <span class="small">• ${m.role.toUpperCase()}</span></div>
+      ${isHost && m.name!==user ? `<select onchange="setRole(${i},this.value)" style="background:#131722;color:#fff;border:1px solid #2b2f39;border-radius:10px;padding:8px 10px">
+        <option value="member" ${m.role==='member'?'selected':''}>Member</option>
+        <option value="mod" ${m.role==='mod'?'selected':''}>Mod</option>
+        <option value="host" ${m.role==='host'?'selected':''}>Host</option>
+      </select>`:''}
+    </div>`).join('');
+}
+function setRole(i,val){ members[i].role=val; localStorage.setItem(K_MEMBERS, JSON.stringify(members)); renderMembers(); }
+renderMembers();
+
+/* ===== Calendar ===== */
+let assignments = JSON.parse(localStorage.getItem(K_ASSIGN)||'[]');
+let events = JSON.parse(localStorage.getItem(K_EVENTS)||'[]');
+const weekGrid = $('weekGrid'), weekAnchor = $('weekAnchor');
+const dayName = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+weekAnchor.value = today;
+function startOfWeek(d){ const x=new Date(d); const day=x.getDay(); x.setDate(x.getDate()-day); x.setHours(0,0,0,0); return x; }
+function setThisWeek(){ weekAnchor.value = today; renderWeek(); }
+weekAnchor.addEventListener('change', renderWeek);
+function renderWeek(){
+  const base = weekAnchor.value? new Date(weekAnchor.value) : new Date();
+  const start = startOfWeek(base);
+  const days = [...Array(7)].map((_,i)=>{ const d=new Date(start); d.setDate(start.getDate()+i); return d; });
+  const items = [];
+  (assignments||[]).forEach(a=> a.due && items.push({type:'deadline',title:a.title,date:a.due}));
+  (events||[]).forEach(e=> items.push({type:'event',title:e.title,date:e.date}));
+  weekGrid.innerHTML = days.map(d=>{
+    const key = d.toISOString().slice(0,10);
+    const list = items.filter(i=>i.date===key);
+    return `<div class="card" style="padding:12px">
+      <div style="font-weight:700;margin-bottom:6px">${dayName[d.getDay()]} ${key}</div>
+      ${list.length? list.map(it=>`<div class="chip" style="margin:4px 0;border-left:3px solid ${it.type==='deadline'?'#ffce54':'var(--accent-2)'};padding-left:8px">${it.type==='deadline'?'กำหนดส่ง:':'อีเวนต์:'} ${esc(it.title)}</div>`).join('') : '<span class="small">— ไม่มีรายการ —</span>'}
+    </div>`;
+  }).join('');
+}
+window.setThisWeek = setThisWeek;
+renderWeek();
+
+function addEvent(){
+  const title = $('evTitle').value.trim(), date = $('evDate').value;
+  if(!title || !date) return alert('กรอกชื่อและวันที่ของ Event');
+  events.push({id:`e_${Date.now()}`, title, date});
+  localStorage.setItem(K_EVENTS, JSON.stringify(events));
+  $('evTitle').value=''; $('evDate').value='';
+  renderWeek();
+}
+
+/* ===== WORK: checklist + assignments ===== */
+let checklist = JSON.parse(localStorage.getItem(K_CHECK)||'[]');
+function renderChecklist(){
+  $('chkList').innerHTML = checklist.length? checklist.map((c,i)=>`
+    <label class="row" style="justify-content:space-between;background:#0f141b;border:1px solid #2b2f39;border-radius:10px;padding:8px 10px">
+      <span><input type="checkbox" ${c.done?'checked':''} onchange="toggleCheck(${i})"> ${esc(c.text)}</span>
+      <button class="btn ghost" onclick="delCheck(${i})">ลบ</button>
+    </label>`).join('') : '<div class="muted">ยังไม่มีรายการ</div>';
+}
+function addCheck(){ const t=$('chkText').value.trim(); if(!t) return; checklist.push({text:t,done:false}); $('chkText').value=''; localStorage.setItem(K_CHECK, JSON.stringify(checklist)); renderChecklist(); }
+function toggleCheck(i){ checklist[i].done=!checklist[i].done; localStorage.setItem(K_CHECK, JSON.stringify(checklist)); renderChecklist(); }
+function delCheck(i){ checklist.splice(i,1); localStorage.setItem(K_CHECK, JSON.stringify(checklist)); renderChecklist(); }
+renderChecklist();
+
+function renderAssignList(targetId){
+  const wrap = $(targetId);
+  if((assignments||[]).length===0){ wrap.innerHTML = '<div class="muted">ยังไม่มีงาน</div>'; return; }
+  wrap.innerHTML = assignments.map(a=>`
+    <div class="card">
+      <h4>${esc(a.title)}</h4>
+      <div class="small">กำหนดส่ง: ${a.due || '-'}</div>
+      <div style="margin-top:6px">${esc(a.detail||'')}</div>
+    </div>`).join('');
+}
+function addAssignment(context){
+  const ids = context==='work'
+    ? {t:'aTitle_w',d:'aDetail_w',u:'aDue_w',a:'aAttach_w'}
+    : {t:'aTitle_l',d:'aDetail_l',u:'aDue_l',a:'aAttach_l'};
+  const title = $(ids.t).value.trim(), detail=$(ids.d).value.trim(), due=$(ids.u).value, attach=$(ids.a).value.trim();
+  if(!title || !detail || !due) return alert('กรอกให้ครบ: ชื่อ/รายละเอียด/กำหนดส่ง');
+  const obj = {id:`a_${Date.now()}`, title, detail, due, points:'100', topic:'', attachments: attach?[attach]:[], createdAt:new Date().toISOString()};
+  assignments.push(obj);
+  localStorage.setItem(K_ASSIGN, JSON.stringify(assignments));
+  // push to calendar
+  events.push({id:`e_${Date.now()}`, title:`กำหนดส่ง: ${title}`, date: due});
+  localStorage.setItem(K_EVENTS, JSON.stringify(events));
+  // clear + re-render
+  $(ids.t).value=''; $(ids.d).value=''; $(ids.u).value=''; $(ids.a).value='';
+  renderWeek();
+  renderAssignList(context==='work'?'assignList_work':'assignList_learn');
+}
+
+/* ===== PROJECT ===== */
+let proj = JSON.parse(localStorage.getItem(K_PROJ)||'{}');
+$('goal').value = proj.goal || ''; $('milestone').value = proj.milestone || '';
+$('goalView').textContent = proj.goal ? `🎯 เป้าหมาย: ${proj.goal} • ไมล์สโตนถัดไป: ${proj.milestone||'-'}` : 'ยังไม่ได้ตั้งค่าเป้าหมาย/ไมล์สโตน';
+function saveProjectInfo(){
+  proj = {goal:$('goal').value.trim(), milestone:$('milestone').value.trim()};
+  localStorage.setItem(K_PROJ, JSON.stringify(proj));
+  $('goalView').textContent = proj.goal ? `🎯 เป้าหมาย: ${proj.goal} • ไมล์สโตนถัดไป: ${proj.milestone||'-'}` : 'ยังไม่ได้ตั้งค่าเป้าหมาย/ไมล์สโตน';
+}
+
+let board = JSON.parse(localStorage.getItem(K_BOARD)||'{"todo":[],"doing":[],"review":[],"done":[]}');
+function renderBoard(){
+  ['todo','doing','review','done'].forEach(col=>{
+    const box = $('col_'+col);
+    const list = board[col]||[];
+    box.innerHTML = list.length? list.map((t,i)=>`
+      <div class="tcard">
+        ${esc(t.title)}
+        <div class="row" style="margin-top:6px">
+          <select onchange="moveCard('${col}',${i},this.value)" style="background:#131722;color:#fff;border:1px solid #2b2f39;border-radius:8px;padding:6px">
+            <option value="todo" ${col==='todo'?'selected':''}>To‑Do</option>
+            <option value="doing" ${col==='doing'?'selected':''}>Doing</option>
+            <option value="review" ${col==='review'?'selected':''}>Review</option>
+            <option value="done" ${col==='done'?'selected':''}>Done</option>
+          </select>
+          <button class="btn ghost" onclick="delCard('${col}',${i})">ลบ</button>
+        </div>
+      </div>`).join('') : '<div class="small">— ไม่มีการ์ด —</div>';
+  });
+}
+function addBoardTask(){
+  const title = $('taskTitle').value.trim(), col = $('taskCol').value;
+  if(!title) return;
+  (board[col] = board[col] || []).push({title, id:'t_'+Date.now()});
+  $('taskTitle').value=''; localStorage.setItem(K_BOARD, JSON.stringify(board)); renderBoard();
+}
+function moveCard(from,i,to){
+  const it = (board[from]||[])[i]; board[from].splice(i,1);
+  (board[to] = board[to] || []).push(it);
+  localStorage.setItem(K_BOARD, JSON.stringify(board)); renderBoard();
+}
+function delCard(col,i){
+  board[col].splice(i,1); localStorage.setItem(K_BOARD, JSON.stringify(board)); renderBoard();
+}
+renderBoard();
+
+/* ===== LEARNING ===== */
+let lessons = JSON.parse(localStorage.getItem(K_LESSON)||'[]');
+function renderLessons(){
+  $('lessons').innerHTML = lessons.length? lessons.map((l,i)=>`
+    <div class="lesson">
+      <strong>${esc(l.title)}</strong> — <a href="${esc(l.url)}" target="_blank">เปิดลิงก์</a>
+      ${isHost? `<div class="small" style="margin-top:6px"><button class="btn ghost" onclick="delLesson(${i})">ลบ</button></div>`:''}
+    </div>`).join('') : '<div class="muted">ยังไม่มีบทเรียน</div>';
+}
+function addLesson(){
+  const title=$('lessonTitle').value.trim(), url=$('lessonUrl').value.trim();
+  if(!title||!url) return alert('กรอกหัวข้อและลิงก์บทเรียน');
+  lessons.push({title,url}); localStorage.setItem(K_LESSON, JSON.stringify(lessons));
+  $('lessonTitle').value=''; $('lessonUrl').value=''; renderLessons();
+}
+function delLesson(i){ lessons.splice(i,1); localStorage.setItem(K_LESSON, JSON.stringify(lessons)); renderLessons(); }
+
+function renderGrades(){
+  const users = members.map(m=>m.name);
+  if(!assignments.length || !users.length){ $('gradeTable').innerHTML = '<div class="muted">ยังไม่มีงานหรือสมาชิก</div>'; return; }
+  let html = `<div class="grade-row" style="font-weight:700;border-bottom:1px solid #2b2f39">
+      <div>ผู้ใช้</div><div>งาน</div><div style="text-align:right">คะแนน</div></div>`;
+  users.forEach(u=>{
+    assignments.forEach(a=>{
+      const gKey = gradeKey(a.id,u);
+      const gVal = localStorage.getItem(gKey)||'';
+      html += `<div class="grade-row">
+        <div>${esc(u)}</div>
+        <div>${esc(a.title)}</div>
+        <div style="text-align:right">
+          ${isHost ? `<input type="text" value="${esc(gVal)}" style="width:80px;text-align:right" onchange="saveGrade('${a.id}','${u}',this.value)">`
+                    : `<span>${esc(gVal||'-')}</span>`}
+        </div>
+      </div>`;
+    });
+  });
+  $('gradeTable').innerHTML = html;
+}
+const gradeKey = (aid,u)=> `grades_${roomId}_${aid}_${u}`;
+function saveGrade(aid,u,val){ localStorage.setItem(gradeKey(aid,u), (val||'').trim()); renderGrades(); }
+
+/* ===== Host-only UI ===== */
+if(isHost){
+  $('bannerActions').style.display = 'flex';
+  $('hostBlock_work')?.style && ($('hostBlock_work').style.display='block');
+  $('hostLessons')?.style && ($('hostLessons').style.display='block');
+  $('hostBlock_learn')?.style && ($('hostBlock_learn').style.display='block');
+}
+
+/* ===== Initial renders by type ===== */
+if(type==='งานทั่วไป'){ renderAssignList('assignList_work'); }
+if(type==='เรียนรู้'){ renderAssignList('assignList_learn'); renderLessons(); renderGrades(); }
+
+/* ===== Room Code (view/copy/edit host) ===== */
+const codeModal = $('codeModal');
+const codeInput = $('codeInput');
+const codeEdit  = $('codeEdit');
+const codeHostRow = $('codeHostRow');
+const codeHint  = $('codeHint');
+
+function normalizeCode(s){return (s||'').toString().trim().toUpperCase().replace(/[^A-Z0-9]/g,'');}
+
+$('codeBtn').onclick = openCode;
+function openCode(){
+  const allRooms = JSON.parse(localStorage.getItem('rooms')||'[]');
+  const current = allRooms.find(r => r.name===room.name && r.createdAt===room.createdAt) || allRooms.find(r=>r.name===room.name);
+  let code = current?.code || room.code || '';
+  codeInput.value = code || '(ยังไม่มีโค้ด)';
+  codeHint.textContent = code ? 'แชร์โค้ดนี้ให้ผู้ใช้คนอื่นเข้าร่วมห้องได้' : 'ยังไม่มีโค้ด — Host สามารถกำหนดโค้ดใหม่ได้ด้านล่าง';
+  codeHostRow.style.display = isHost ? 'flex' : 'none';
+  codeEdit.value = code ? code : '';
+  codeModal.style.display = 'flex';
+}
+function closeCode(){ codeModal.style.display = 'none'; }
+function copyCode(){
+  if(!codeInput.value || codeInput.value==='(ยังไม่มีโค้ด)'){ alert('ยังไม่มีโค้ดให้คัดลอก'); return; }
+  navigator.clipboard.writeText(codeInput.value);
+  alert('คัดลอกโค้ดแล้ว');
+}
+function saveNewCode(){
+  let newCode = normalizeCode(codeEdit.value);
+  if(!newCode || newCode.length<4 || newCode.length>10){ alert('กำหนดโค้ดเป็น A‑Z/0‑9 ความยาว 4–10 ตัว'); return; }
+  const allRooms = JSON.parse(localStorage.getItem('rooms')||'[]');
+  const idx = allRooms.findIndex(r => r.name===room.name && r.createdAt===room.createdAt);
+  if(idx>=0){ allRooms[idx].code = newCode; localStorage.setItem('rooms', JSON.stringify(allRooms)); }
+  // อัปเดต lastRoom ด้วย
+  localStorage.setItem('lastRoom', JSON.stringify({...room, code:newCode}));
+  codeInput.value = newCode;
+  codeHint.textContent = 'อัปเดตโค้ดเรียบร้อย';
+  alert('บันทึกโค้ดแล้ว');
+}
+
+/* ===== Delete Room (host only) ===== */
+$('delBtn').onclick = deleteRoom;
+function deleteRoom(){
+  if(!isHost){ return alert('เฉพาะ Host เท่านั้นที่ลบห้องได้'); }
+  if(!confirm('ต้องการลบห้องนี้และข้อมูลทั้งหมดจริงหรือไม่?')) return;
+
+  // ลบจาก rooms
+  const rooms = JSON.parse(localStorage.getItem('rooms')||'[]');
+  const remained = rooms.filter(r => !(r.name===room.name && r.createdAt===room.createdAt));
+  localStorage.setItem('rooms', JSON.stringify(remained));
+
+  // เคลียร์ข้อมูลที่เกี่ยวข้องทั้งหมดของห้องนี้
+  [K_ASSIGN,K_EVENTS,K_MEMBERS,K_BANNER,K_BOARD,K_LESSON,K_CHECK,K_PROJ].forEach(k=> localStorage.removeItem(k));
+
+  // ลบคะแนนที่เก็บแบบ key-by-key
+  try{
+    Object.keys(localStorage).forEach(k=>{
+      if(k.startsWith(`grades_${roomId}_`)) localStorage.removeItem(k);
+    });
+  }catch(e){}
+
+  localStorage.removeItem('lastRoom');
+
+  alert('ลบห้องสำเร็จ');
+  location.href = 'dashboard.html';
+}
+
+/* ===== Enable host controls visibility ===== */
+if(isHost){ document.getElementById('bannerActions').style.display='flex'; }
+
+/* ===== End ===== */
+</script>
+<script type="module" src="firebase.js"></script>
+<script type="module">
+import { db, auth, collection, doc, getDoc, updateDoc, setDoc, addDoc, serverTimestamp } from './firebase.js';
+// เพิ่มฟังก์ชัน Firestore ที่ต้องการใช้งานได้ที่นี่
+</script>
+</body>
+</html>

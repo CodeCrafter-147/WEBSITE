@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>SR WorkRoom • สร้างห้องใหม่</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b0c10; --surface:#121317; --surface-2:#17181e;
+      --text:#fff; --sub:#cfd3da; --accent:#00f2fe; --accent-2:#8a2be2;
+      --ok:#00e5a8; --warn:#ff6b6b; --line:#242836; --glow:0 0 30px rgba(0,242,254,.25); --radius:14px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{
+      font-family:'Prompt',sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, #1b2b34 0%, transparent 60%),
+                  radial-gradient(900px 600px at 100% 0%, #241b3a 0%, transparent 55%),
+                  var(--bg);
+      color:var(--text); min-height:100vh; display:flex; flex-direction:column;
+    }
+
+    /* Top nav (ให้ฟีลเดียวกับแพลตฟอร์ม) */
+    .nav{position:sticky; top:0; z-index:50; backdrop-filter:blur(8px);
+      background:linear-gradient(180deg,rgba(15,15,18,.85),rgba(15,15,18,.55)); border-bottom:1px solid #22262e;}
+    .nav-wrap{max-width:1200px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+    .badge{border:2px solid var(--accent);border-radius:10px;padding:6px 10px;background:linear-gradient(90deg,#00f2fe22,#8a2be222);box-shadow:var(--glow)}
+    .btn{appearance:none;border:none;cursor:pointer;font-weight:600;padding:10px 16px;border-radius:10px;transition:.25s}
+    .btn.ghost{background:transparent;color:var(--sub);border:1px solid #2a2f38}
+    .btn.ghost:hover{border-color:#3a404b;color:#fff}
+    .btn.primary{color:#000;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+    .btn.ok{color:#000;background:linear-gradient(90deg,var(--ok),#66ffd1)}
+    .btn.warn{background:var(--warn); color:#000}
+
+    /* Form card */
+    .wrap{flex:1;display:grid;place-items:center;padding:40px 16px}
+    .card{
+      width:100%;max-width:560px;background:linear-gradient(180deg,var(--surface-2),var(--surface));
+      border:1px solid var(--line);border-radius:var(--radius);padding:24px 22px;box-shadow:0 20px 40px rgba(0,0,0,.35)
+    }
+    h1{margin:0 0 8px;font-size:26px}
+    p.muted{margin:0 0 18px;color:#aeb4bf}
+    .field{margin-bottom:14px}
+    label{display:block;margin-bottom:6px;font-weight:600}
+    input[type="text"], textarea, select{
+      width:100%;padding:12px;border-radius:10px;border:1px solid #2b2f39;background:#131722;color:#fff
+    }
+    textarea{min-height:110px}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .hint{font-size:12px;color:#9aa3b2;margin-top:6px}
+    .error{background:#2a1316;border:1px solid #70343a;color:#ffb4b4;padding:10px;border-radius:10px;margin-bottom:12px;display:none}
+    .okmsg{background:#0f2a21;border:1px solid #2e6b55;color:#b9ffdf;padding:10px;border-radius:10px;margin-bottom:12px;display:none}
+
+    .preview{
+      background:#0f141a;border:1px solid #202632;border-radius:10px;padding:12px;color:#aeb4bf;font-size:13px
+    }
+  </style>
+</head>
+<body>
+  <!-- Top nav -->
+  <header class="nav">
+    <div class="nav-wrap">
+      <div class="badge">SR WorkRoom</div>
+      <div>
+        <button class="btn ghost" onclick="location.href='dashboard.html'">แดชบอร์ด</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="card">
+      <h1>สร้างห้องใหม่</h1>
+      <p class="muted">ตั้งชื่อห้อง เลือกประเภท และเพิ่มรายละเอียด เพื่อเริ่มใช้งานร่วมกับทีมของคุณ</p>
+
+      <div id="err" class="error"></div>
+      <div id="ok" class="okmsg"></div>
+
+      <div class="field">
+        <label for="roomName">ชื่อห้อง *</label>
+        <input id="roomName" type="text" placeholder="เช่น Team A Project / คอร์ส Data 101">
+      </div>
+
+      <div class="field">
+        <label for="roomDetail">รายละเอียด</label>
+        <textarea id="roomDetail" placeholder="อธิบายวัตถุประสงค์ หรือแนบกฎการใช้งานห้องโดยย่อ"></textarea>
+      </div>
+
+      <div class="row">
+        <div class="field" style="flex:1; min-width:220px">
+          <label for="roomType">ประเภทห้อง *</label>
+          <select id="roomType">
+            <option value="">— เลือกประเภท —</option>
+            <option value="เรียนรู้">เรียนรู้</option>
+            <option value="โปรเจกต์">โปรเจกต์</option>
+            <option value="งานทั่วไป">งานทั่วไป</option>
+          </select>
+        </div>
+        <div class="field" style="flex:1; min-width:220px">
+          <label>รหัสห้อง (สร้างอัตโนมัติ)</label>
+          <div class="preview" id="codePreview">— จะสร้างเมื่อกด “สร้างห้อง” —</div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:6px">
+        <button class="btn primary" id="createBtn">สร้างห้อง</button>
+        <button class="btn ghost" onclick="location.href='dashboard.html'">ยกเลิก</button>
+      </div>
+
+      <div class="hint" style="margin-top:12px">
+        ผู้สร้างห้องจะถูกตั้งเป็น <strong>Host</strong> โดยอัตโนมัติ และถูกเพิ่มเป็นสมาชิกห้องทันที
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const $ = id => document.getElementById(id);
+
+    $('createBtn').addEventListener('click', ()=>{
+      hideErr(); hideOk();
+
+      const name = $('roomName').value.trim();
+      const detail = $('roomDetail').value.trim();
+      const type = $('roomType').value;
+      const currentUser = localStorage.getItem('currentUser') || 'me';
+
+      if(!name || !type){
+        return showErr('กรุณากรอก “ชื่อห้อง” และ “ประเภทห้อง”');
+      }
+
+      const code = genCode(); // รหัสห้อง
+      $('codePreview').textContent = code;
+
+      // สร้างข้อมูลห้อง: ผู้สร้างเป็น host เสมอ
+      const room = {
+        name, detail, type,
+        code,
+        role: 'host',            // สำคัญ: ผู้สร้างคือ Host
+        createdBy: currentUser,
+        createdAt: new Date().toISOString()
+      };
+
+      // เก็บลง rooms รวม
+      const rooms = JSON.parse(localStorage.getItem('rooms') || '[]');
+      rooms.push(room);
+      localStorage.setItem('rooms', JSON.stringify(rooms));
+
+      // ตั้งห้องล่าสุดสำหรับเปิด room.html
+      localStorage.setItem('lastRoom', JSON.stringify(room));
+
+      // สร้างสมาชิกเริ่มต้น: ผู้สร้างเป็น host
+      const K_MEMBERS = `members_${room.name}`;
+      const initialMembers = [{ name: currentUser, role: 'host' }];
+      localStorage.setItem(K_MEMBERS, JSON.stringify(initialMembers));
+
+      showOk('สร้างห้องสำเร็จ! กำลังพาไปยังห้องของคุณ…');
+      setTimeout(()=> location.href='room.html', 700);
+    });
+
+    function genCode(){ return Math.random().toString(36).slice(2,8).toUpperCase(); }
+    function showErr(msg){ const b=$('err'); b.textContent=msg; b.style.display='block'; }
+    function hideErr(){ $('err').style.display='none'; }
+    function showOk(msg){ const b=$('ok'); b.textContent=msg; b.style.display='block'; }
+    function hideOk(){ $('ok').style.display='none'; }
+  </script>
+  <script type="module" src="firebase.js"></script>
+  <script type="module">
+import { db, auth, collection, addDoc } from './firebase.js';
+// สามารถเพิ่มฟังก์ชัน Firestore อื่นๆ ที่ต้องการใช้งานได้ที่นี่
+</script>
+</body>
+</html>

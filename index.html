@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SR WorkRoom — โฮม</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b0c10; --surface:#121317; --surface-2:#17181e;
+      --text:#fff; --sub:#cfd3da; --accent:#00f2fe; --accent-2:#8a2be2;
+      --line:#242836; --radius:14px; --glow:0 0 30px rgba(0,242,254,.25);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0; scroll-behavior:smooth}
+    body{
+      font-family:'Prompt',sans-serif; color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, #1b2b34 0%, transparent 60%),
+        radial-gradient(900px 600px at 100% 0%, #241b3a 0%, transparent 55%),
+        var(--bg);
+    }
+
+    /* Top Nav */
+    .nav{position:sticky; top:0; z-index:50; backdrop-filter: blur(8px);
+      background: linear-gradient(180deg, rgba(15,15,18,.85), rgba(15,15,18,.55));
+      border-bottom:1px solid #22262e;}
+    .nav-wrap{max-width:1200px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; justify-content:space-between}
+    .badge{border:2px solid var(--accent); border-radius:10px; padding:6px 10px; background:linear-gradient(90deg,#00f2fe22,#8a2be222); box-shadow:var(--glow); font-weight:700}
+    .nav-actions{display:flex; gap:10px}
+    .btn{appearance:none; border:none; cursor:pointer; font-weight:600; padding:10px 16px; border-radius:12px; transition:.25s; text-decoration:none}
+    .btn.primary{color:#000; background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+    .btn.ghost{background:transparent; color:var(--sub); border:1px solid #2a2f38}
+    .btn.ghost:hover{border-color:#3a404b; color:#fff}
+
+    /* Section wrapper + divider */
+    .section{max-width:1200px; margin:0 auto; padding:64px 20px}
+    .divider{height:1px; background:linear-gradient(90deg, transparent,#2a3348,transparent); opacity:.85; border:0}
+
+    /* Hero */
+    .hero{display:grid; grid-template-columns: 1.1fr .9fr; gap:28px; align-items:center; padding-top:72px; padding-bottom:26px}
+    .hero h1{font-size:46px; line-height:1.12; margin:0 0 12px}
+    .hero p{color:var(--sub); font-size:18px; margin:0 0 22px}
+    .hero-visual{
+      border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;
+      background:linear-gradient(180deg,#16171d,#121317); box-shadow:0 20px 40px rgba(0,0,0,.35);
+    }
+    .hv-bar{display:flex; gap:8px; align-items:center; padding:10px 12px; border-bottom:1px solid #212433; background:linear-gradient(180deg,#171925,#121317)}
+    .dot{width:10px; height:10px; border-radius:50%}
+    .hv-body{padding:16px; display:grid; gap:12px}
+    .fake{background:#0f1219; border:1px solid #252a39; border-radius:12px; padding:12px}
+    .fake .t{height:14px; width:50%; background:#1d2436; border-radius:8px; margin-bottom:8px}
+    .fake .l{height:10px; width:100%; background:#182033; border-radius:8px; margin:6px 0}
+    .pill{display:inline-flex; gap:8px; align-items:center; font-size:12px; color:#9aa3b2; padding:6px 10px; border-radius:999px; border:1px solid #2b2f39; background:#171921}
+
+    /* Feature band (แบบ Edge: สลับรูป/ข้อความ) */
+    .band{display:grid; grid-template-columns: 1fr 1fr; gap:28px; align-items:center}
+    .band.reverse{grid-template-columns: 1fr 1fr}
+    .band h2{margin:0 0 8px; font-size:28px}
+    .band p{margin:0 0 12px; color:#aeb4bf}
+    .mock{
+      border:1px solid var(--line); border-radius:16px; overflow:hidden;
+      background:linear-gradient(180deg, var(--surface-2), var(--surface)); position:relative
+    }
+    .mock > .hdr{display:flex; gap:8px; align-items:center; padding:10px 12px; border-bottom:1px solid #212433; background:linear-gradient(180deg,#171925,#121317)}
+    .mock > .cnt{padding:16px; display:grid; gap:10px}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    input[type="text"], input[type="date"], textarea, select{
+      width:100%; padding:10px 12px; border-radius:10px; border:1px solid #2b2f39; background:#131722; color:#fff
+    }
+    .tag{display:inline-block; font-size:11px; color:#9aa3b2; border:1px solid #2b2f39; padding:4px 8px; border-radius:999px}
+    .grid{display:grid; gap:14px; grid-template-columns: repeat(auto-fill,minmax(260px,1fr))}
+    .card{background:linear-gradient(180deg, var(--surface-2), var(--surface)); border:1px solid var(--line); border-radius:16px; padding:16px; transition:.25s}
+    .card:hover{transform:translateY(-2px); box-shadow:var(--glow)}
+
+    /* Carousel (ฟีเจอร์ย่อย) */
+    .carousel{position:relative; margin-top:6px}
+    .track{display:flex; overflow:auto; scroll-snap-type:x mandatory; gap:12px; padding-bottom:6px}
+    .tile{scroll-snap-align:start; min-width:320px; background:linear-gradient(180deg, var(--surface-2), var(--surface)); border:1px solid var(--line); border-radius:14px; padding:14px}
+    .tile h3{margin:0 0 6px; font-size:18px}
+    .shot{height:150px; border-radius:10px; border:1px solid #273044; background: center/cover no-repeat}
+
+    /* Steps + CTA */
+    .steps{display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(240px,1fr))}
+    .step{background:linear-gradient(180deg,#16171d,#121317); border:1px solid #23283a; border-radius:16px; padding:16px}
+    .step strong{display:block; margin-bottom:6px}
+
+    /* FAQ */
+    .faq{max-width:900px}
+    .qa{border-bottom:1px solid #23283a}
+    .qa button{width:100%; text-align:left; background:transparent; color:#fff; border:none; padding:16px 0; font-size:16px; cursor:pointer; display:flex; justify-content:space-between; align-items:center}
+    .qa .a{max-height:0; overflow:hidden; transition:max-height .25s ease}
+    .qa.open .a{max-height:300px; padding-bottom:12px}
+    .qa .a p{color:#aeb4bf; margin:0 0 8px}
+
+    footer{border-top:1px solid #20242f; color:#7d8795; font-size:13px; padding:22px 20px; text-align:center}
+
+    /* Appear animation */
+    .reveal{opacity:0; transform:translateY(16px); transition:.6s ease}
+    .reveal.show{opacity:1; transform:none}
+
+    @media(max-width:980px){
+      .hero{grid-template-columns:1fr}
+      .band{grid-template-columns:1fr}
+      .band.reverse{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <header class="nav">
+    <div class="nav-wrap">
+      <div class="badge">SR WorkRoom</div>
+      <div class="nav-actions">
+        <a class="btn ghost" href="login.html">เข้าสู่ระบบ</a>
+        <a class="btn ghost" href="register.html">สมัครสมาชิก</a>
+        <a class="btn primary" href="dashboard.html">ไป Dashboard</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="section hero">
+    <div class="reveal">
+      <h1>ทำงานและเรียนรู้ในที่เดียว — ลื่นไหลแบบแพลตฟอร์มจริง</h1>
+      <p>สร้างห้อง งาน กำหนดส่ง ปฏิทิน และคลังความรู้ได้ทันที UI เข้มทันสมัย เข้าใจง่าย</p>
+      <div class="row">
+        <a class="btn primary" href="create-room.html">+ สร้างห้อง</a>
+        <a class="btn ghost" href="#features">ดูฟีเจอร์</a>
+      </div>
+    </div>
+    <div class="hero-visual reveal" aria-hidden="true">
+      <div class="hv-bar">
+        <span class="dot" style="background:#ff6b6b"></span>
+        <span class="dot" style="background:#ffd166"></span>
+        <span class="dot" style="background:#06d6a0"></span>
+        <span style="margin-left:auto;color:#9aa3b2;font-size:12px">SR WorkRoom Preview</span>
+      </div>
+      <div class="hv-body">
+        <span class="pill">สัปดาห์นี้ • 3 กำหนดส่ง</span>
+        <div class="fake">
+          <div class="t"></div>
+          <div class="l"></div><div class="l" style="width:70%"></div>
+        </div>
+        <div class="fake">
+          <div class="t" style="width:35%"></div>
+          <div class="l"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider"/>
+
+  <!-- BAND 1: มอบหมายงาน -->
+  <section id="features" class="section band">
+    <div class="reveal">
+      <h2>มอบหมายงานละเอียด • ดึงเข้าปฏิทินอัตโนมัติ</h2>
+      <p>กำหนดชื่อ รายละเอียด คะแนน หัวข้อ ไฟล์แนบ และวันครบกำหนด ระบบจะซิงค์ไปยังปฏิทินสัปดาห์ของคุณทันที</p>
+      <div class="row">
+        <a class="btn primary" href="create-task.html">สร้างงาน</a>
+        <a class="btn ghost" href="dashboard.html#this-week">ดูสัปดาห์นี้</a>
+      </div>
+    </div>
+    <div class="mock reveal" aria-hidden="true">
+      <div class="hdr">
+        <span class="dot" style="background:#8a2be2"></span>
+        <span class="dot" style="background:#00f2fe"></span>
+        <span style="font-size:12px;color:#9aa3b2">Assignment Mock</span>
+      </div>
+      <div class="cnt">
+        <div class="row">
+          <input type="text" placeholder="ชื่องาน *" style="flex:1">
+          <input type="date" style="width:180px">
+        </div>
+        <input type="text" placeholder="หัวข้อ (เช่น Module A)">
+        <textarea placeholder="รายละเอียดงาน *"></textarea>
+        <div class="row">
+          <input type="text" placeholder="แนบลิงก์ (URL)" style="flex:1">
+          <a class="btn primary" href="#">ตัวอย่าง</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BAND 2: ปฏิทินสัปดาห์ -->
+  <section class="section band reverse">
+    <div class="mock reveal" aria-hidden="true">
+      <div class="hdr">
+        <span class="dot" style="background:#06d6a0"></span>
+        <span class="dot" style="background:#ffd166"></span>
+        <span style="font-size:12px;color:#9aa3b2">Weekly Calendar</span>
+      </div>
+      <div class="cnt">
+        <div class="grid" style="grid-template-columns:repeat(7,1fr)">
+          <!-- สร้างการ์ดวันแบบ mock -->
+          <div class="card"><strong>อา</strong><div class="tag">—</div></div>
+          <div class="card"><strong>จ</strong><div class="tag">กำหนดส่ง: รายงาน</div></div>
+          <div class="card"><strong>อ</strong><div class="tag">—</div></div>
+          <div class="card"><strong>พ</strong><div class="tag">Event: ประชุมทีม</div></div>
+          <div class="card"><strong>พฤ</strong><div class="tag">—</div></div>
+          <div class="card"><strong>ศ</strong><div class="tag">กำหนดส่ง: โครงร่าง</div></div>
+          <div class="card"><strong>ส</strong><div class="tag">—</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="reveal">
+      <h2>ปฏิทินสัปดาห์ • เห็นภาพรวมทันที</h2>
+      <p>รวมกำหนดส่งและอีเวนต์จากทุกห้อง แสดงเป็นสัปดาห์นี้แบบอ่านง่าย</p>
+      <div class="row">
+        <a class="btn primary" href="dashboard.html#this-week">ไปที่ Dashboard</a>
+        <a class="btn ghost" href="room.html">ดูในห้อง</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ฟีเจอร์ย่อยแบบ Carousel -->
+  <section class="section">
+    <h2 style="margin:0 0 10px">ฟีเจอร์เด่นอื่น ๆ</h2>
+    <div class="carousel reveal">
+      <div class="track" id="track">
+        <div class="tile">
+          <h3>สิทธิ์แบบ Discord</h3>
+          <p>Host / Mod / Member ปรับสิทธิ์ได้ยืดหยุ่น</p>
+          <div class="shot" style="background-image:
+          radial-gradient(60% 80% at 10% 10%, #26304a 0%, transparent 60%),
+          linear-gradient(180deg,#0f141b,#0f141b);"></div>
+        </div>
+        <div class="tile">
+          <h3>บอร์ดโปรเจกต์</h3>
+          <p>To‑Do / Doing / Review / Done</p>
+          <div class="shot" style="background:
+            linear-gradient(90deg,#1a2030 25%,#151b28 25% 50%,#131822 50% 75%,#11161f 75%),
+            repeating-linear-gradient(0deg, #223, #223 2px, transparent 2px, transparent 8px);"></div>
+        </div>
+        <div class="tile">
+          <h3>คลังความรู้</h3>
+          <p>รวมลิงก์ วิดีโอ เอกสาร ไว้ที่เดียว</p>
+          <div class="shot" style="background:
+            linear-gradient(180deg,#141a24,#121722),
+            radial-gradient(160px 100px at 70% 30%, #24304b 0%, transparent 60%);"></div>
+        </div>
+        <div class="tile">
+          <h3>ธีมส่วนตัว</h3>
+          <p>เลือกสี Accent / มุมโค้ง / ความหนาแน่น</p>
+          <div class="shot" style="background:
+            conic-gradient(from 0deg, #00f2fe22, #8a2be222, #00f2fe22),
+            linear-gradient(180deg,#121722,#0f141b);"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider"/>
+
+  <!-- Steps -->
+  <section class="section">
+    <h2 style="margin-top:0">เริ่มใช้งานใน 3 ขั้นตอน</h2>
+    <div class="steps reveal">
+      <div class="step"><strong>1. สร้างห้อง</strong><span class="sub">เลือกประเภท: งาน / โปรเจกต์ / เรียนรู้</span></div>
+      <div class="step"><strong>2. มอบหมายงาน</strong><span class="sub">กรอกกำหนดส่ง + แนบลิงก์</span></div>
+      <div class="step"><strong>3. ติดตามผล</strong><span class="sub">ดูปฏิทินสัปดาห์ ตรวจงาน ให้คะแนน</span></div>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <a class="btn primary" href="create-room.html">เริ่มสร้างห้อง</a>
+      <a class="btn ghost" href="dashboard.html">เปิด Dashboard</a>
+    </div>
+  </section>
+
+  <hr class="divider"/>
+
+  <!-- FAQ -->
+  <section class="section faq">
+    <h2 style="margin-top:0">คำถามที่พบบ่อย</h2>
+    <div class="qa reveal">
+      <button type="button"><span>ต้องสมัครสมาชิกไหม?</span><span>＋</span></button>
+      <div class="a"><p>เริ่มแบบ Local ได้ทันที (ข้อมูลเก็บในเครื่อง) แล้วค่อยเชื่อมต่อบัญชีภายหลัง</p></div>
+    </div>
+    <div class="qa reveal">
+      <button type="button"><span>ห้อง “งาน/โปรเจกต์/เรียนรู้” ต่างกันยังไง?</span><span>＋</span></button>
+      <div class="a"><p>งาน: เช็กลิสต์ + งาน • โปรเจกต์: บอร์ดคานบัง • เรียนรู้: บทเรียน + งาน + คะแนน</p></div>
+    </div>
+    <div class="qa reveal">
+      <button type="button"><span>กำหนดส่งแสดงบน Dashboard อัตโนมัติ?</span><span>＋</span></button>
+      <div class="a"><p>ใช่ เมื่อสร้างงานพร้อมวันครบกำหนด จะขึ้นใน “สัปดาห์นี้” ทันที</p></div>
+    </div>
+  </section>
+
+  <footer>© 2025 SR WorkRoom • ทำงานง่ายขึ้นและร่วมกันได้ดีกว่าเดิม</footer>
+
+  <script>
+    // Reveal on scroll
+    const io = new IntersectionObserver((ents)=>{
+      ents.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('show'); io.unobserve(e.target);} });
+    },{threshold:.12});
+    document.querySelectorAll('.reveal').forEach(el=> io.observe(el));
+
+    // FAQ accordion
+    document.querySelectorAll('.qa button').forEach(btn=>{
+      btn.addEventListener('click', ()=> btn.parentElement.classList.toggle('open'));
+    });
+  </script>
+</body>
+</html>

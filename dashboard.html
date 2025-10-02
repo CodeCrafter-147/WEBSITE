@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SR WorkRoom - Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b0c10;
+      --surface:#121317;
+      --surface-2:#17181e;
+      --text:#ffffff;
+      --sub:#cfd3da;
+      --accent:#00f2fe;
+      --accent-2:#8a2be2;
+      --radius:14px;
+      --line:#242836;
+      --glow:0 0 30px rgba(0,242,254,.25);
+      --density:1;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{
+      font-family:'Prompt',sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, #1b2b34 0%, transparent 60%),
+                  radial-gradient(900px 600px at 100% 0%, #241b3a 0%, transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+
+    /* ===== Top nav (เหมือนเดิม) ===== */
+    .nav{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(8px);
+      background: linear-gradient(180deg, rgba(15,15,18,.85), rgba(15,15,18,.55));
+      border-bottom:1px solid #22262e;
+    }
+    .nav-wrap{
+      max-width:1200px; margin:0 auto; padding:14px 20px;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .badge{
+      border:2px solid var(--accent); border-radius:10px; padding:6px 10px;
+      background:linear-gradient(90deg,#00f2fe22,#8a2be222); box-shadow:var(--glow);
+      font-weight:700;
+    }
+    .nav-left{display:flex; align-items:center; gap:10px}
+    .btn{
+      appearance:none; border:none; cursor:pointer; font-weight:600;
+      padding: calc(10px * var(--density)) calc(16px * var(--density));
+      border-radius:12px; transition:.25s;
+    }
+    .btn.ghost{background:transparent; color:var(--sub); border:1px solid #2a2f38}
+    .btn.ghost:hover{border-color:#3a404b; color:#fff}
+    .btn.primary{color:#000; background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+    .btn.primary:hover{transform:translateY(-1px)}
+
+    /* ===== Sections (เหมือนเดิม) ===== */
+    .hero{
+      max-width:1200px; margin:0 auto; padding:56px 20px 28px;
+      display:grid; grid-template-columns: 1.1fr .9fr; gap:28px; align-items:center;
+    }
+    .hero h1{font-size:42px; line-height:1.15; margin:0 0 12px}
+    .hero p{color:var(--sub); font-size:18px; margin:0 0 22px}
+    .hero .cta{display:flex; gap:12px; flex-wrap:wrap}
+    .hero-card{
+      background:linear-gradient(180deg,#16171d,#121317);
+      border:1px solid var(--line); border-radius:var(--radius); padding:22px;
+      box-shadow: 0 20px 40px rgba(0,0,0,.35);
+    }
+
+    .section{max-width:1200px; margin:14px auto 60px; padding:0 20px}
+    .section h2{font-size:24px; margin:0 0 16px}
+    .grid{
+      display:grid; gap:18px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    }
+    .card{
+      background: linear-gradient(180deg, var(--surface-2), var(--surface));
+      border:1px solid var(--line); border-radius:var(--radius); padding:18px;
+      transition:.25s; position:relative; overflow:hidden;
+    }
+    .card:hover{transform:translateY(-3px); box-shadow:var(--glow)}
+    .card h3{margin:0 0 6px; font-size:18px}
+    .card p{margin:0; color:#aeb4bf; font-size:14px}
+    .pill-sec{display:inline-flex; align-items:center; gap:8px; font-size:12px; color:#9aa3b2;
+      padding:6px 10px; border-radius:999px; border:1px solid #2b2f39; background:#171921}
+
+    .week-grid{
+      display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
+    }
+    .week{
+      background: linear-gradient(180deg,#161922,#121317);
+      border:1px solid #262b37; border-radius:var(--radius); padding:16px;
+    }
+    .week strong{display:block; margin-bottom:6px}
+    .muted{color:#9aa3b2; font-size:14px}
+
+    .room{cursor:pointer}
+    .room .tag{
+      display:inline-block; font-size:11px; color:#9aa3b2;
+      border:1px solid #2b2f39; padding:4px 8px; border-radius:999px; margin-top:10px;
+    }
+    .empty{color:#9aa3b2; font-size:14px; border:1px dashed #2b2f39; border-radius:var(--radius); padding:16px; background:#101217}
+
+    footer{border-top:1px solid #20242f; color:#7d8795; font-size:13px; padding:22px 20px; text-align:center}
+    .container{max-width:1200px; margin:0 auto}
+
+    /* ===== Drawer ด้านซ้าย: โปรไฟล์/บัญชี/Settings เท่านั้น ===== */
+    .drawer{
+      position:fixed; inset:0 auto 0 0; width:340px; max-width:86vw;
+      background:linear-gradient(180deg, var(--surface-2), var(--surface));
+      border-right:1px solid var(--line);
+      transform:translateX(-105%); transition:.35s ease;
+      z-index:60; padding:16px;
+      box-shadow:20px 0 40px rgba(0,0,0,.45);
+    }
+    .drawer.open{ transform:none; }
+    .drawer-dim{
+      position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; z-index:59;
+    }
+    .drawer.open + .drawer-dim{ display:block; }
+
+    .acc-header{
+      display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:14px;
+    }
+    .badge{
+      border:2px solid var(--accent);
+      border-radius:10px; padding:6px 10px;
+      background:linear-gradient(90deg,#00f2fe22,#8a2be222);
+      box-shadow:var(--glow);
+      font-weight:700;
+    }
+    .acc-title{ font-weight:700; margin:16px 0 10px; font-size:14px; color:#d7dbe4; letter-spacing:.2px }
+
+    .profile{
+      display:grid; grid-template-columns:64px 1fr; gap:12px; align-items:center;
+      background: #0f1219; border:1px solid #2b2f39; border-radius:12px; padding:12px;
+    }
+    .avatar{
+      width:64px; height:64px; border-radius:50%; border:2px solid var(--accent);
+      background:#0d0f14 center/cover no-repeat;
+    }
+    .profile .row{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:6px}
+    .mini{font-size:12px; color:#9aa3b2}
+    .field{margin:8px 0}
+    .label{font-size:12px; color:#9aa3b2; margin-bottom:4px}
+    .input, .select{
+      width:100%; padding: calc(10px * var(--density)) calc(12px * var(--density));
+      border-radius:10px; border:1px solid #2b2f39; background:#131722; color:#fff;
+    }
+    .color-pick{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+    .color-pick input[type="color"]{
+      appearance:none; width:34px; height:34px; border-radius:8px; border:1px solid #2b2f39; padding:0; background:transparent
+    }
+    .range{ width:100% }
+    .sep{height:1px; background:#1f2330; margin:12px 0}
+  </style>
+</head>
+<body>
+
+  <!-- ===== Top nav (มีปุ่มเปิด Drawer) ===== -->
+  <header class="nav">
+    <div class="nav-wrap">
+      <div class="nav-left">
+        <button class="btn ghost" id="openDrawer">☰ บัญชี</button>
+        <div class="badge">SR WorkRoom</div>
+      </div>
+      <div class="nav-actions">
+        <button class="btn ghost" onclick="openJoin()">เข้าร่วมห้องด้วยโค้ด</button>
+        <button class="btn ghost" onclick="window.location.href='create-room.html'">+ สร้างห้อง</button>
+        <button class="btn primary" onclick="window.location.href='create-room.html'">เริ่มใช้งาน</button>
+        <button class="btn ghost" onclick="logout()">ออกจากระบบ</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== Drawer โปรไฟล์/บัญชี/Settings เท่านั้น ===== -->
+  <aside id="drawer" class="drawer">
+    <div class="acc-header">
+      <div class="badge">บัญชีผู้ใช้</div>
+      <button class="btn ghost" id="closeDrawer" title="ปิด">✕</button>
+    </div>
+
+    <!-- โปรไฟล์ -->
+    <div class="acc-title">โปรไฟล์</div>
+    <div class="profile">
+      <div id="avatar" class="avatar"></div>
+      <div>
+        <div class="row">
+          <label class="btn ghost" for="avatarInput">เปลี่ยนรูป</label>
+          <input id="avatarInput" type="file" accept="image/*" style="display:none">
+        </div>
+        <div class="mini">รูปของคุณถูกเก็บในเครื่อง (Local)</div>
+      </div>
+    </div>
+    <div class="field">
+      <div class="label">ชื่อที่แสดง</div>
+      <input id="displayName" class="input" type="text" placeholder="เช่น คุณเอ">
+    </div>
+    <div class="field">
+      <div class="label">คำอธิบายสั้น ๆ</div>
+      <input id="bio" class="input" type="text" placeholder="เช่น ทีมโปรเจกต์ A / ฝ่ายวิจัย">
+    </div>
+    <div class="row">
+      <button class="btn primary" id="saveProfile">บันทึกโปรไฟล์</button>
+      <span id="profileSaved" class="mini" style="display:none">บันทึกแล้ว ✓</span>
+    </div>
+
+    <div class="sep"></div>
+
+    <!-- Settings -->
+    <div class="acc-title">การตั้งค่าส่วนตัว</div>
+    <div class="field">
+      <div class="label">สี Accent</div>
+      <div class="color-pick">
+        <input id="accent" type="color" value="#00f2fe" title="Accent 1">
+        <input id="accent2" type="color" value="#8a2be2" title="Accent 2">
+        <button class="btn primary" type="button">ตัวอย่าง</button>
+      </div>
+    </div>
+    <div class="field">
+      <div class="label">ความโค้งมุม (Radius)</div>
+      <input id="radius" class="range" type="range" min="6" max="22" value="14">
+    </div>
+    <div class="field">
+      <div class="label">ความหนาแน่น (Compact)</div>
+      <input id="density" class="range" type="range" min="0.85" max="1.15" step="0.01" value="1">
+      <div class="mini">ลดค่าจะทำให้ปุ่ม/อินพุตแน่นขึ้น</div>
+    </div>
+    <div class="row">
+      <button class="btn ghost" id="resetTheme">รีเซ็ต</button>
+      <button class="btn primary" id="saveTheme">บันทึกการตั้งค่า</button>
+      <span id="themeSaved" class="mini" style="display:none">บันทึกแล้ว ✓</span>
+    </div>
+
+    <div class="sep"></div>
+    <button class="btn ghost" onclick="logout()">ออกจากระบบ</button>
+  </aside>
+  <div id="drawerDim" class="drawer-dim"></div>
+
+  <!-- ===== เนื้อหาเดิมของ Dashboard (ไม่ย้ายไปซ้าย) ===== -->
+  <section class="hero">
+    <div>
+      <h1>จัดการงานและการเรียนรู้ของทีม <br>ในที่เดียว แบบเรียบง่ายและทรงพลัง</h1>
+      <p>สร้างห้อง มอบหมายงาน วางกำหนดส่ง แชร์ความรู้ และติดตามความคืบหน้า—ทั้งหมดนี้ในประสบการณ์ที่ลื่นไหลและทันสมัย</p>
+      <div class="cta">
+        <button class="btn primary" onclick="window.location.href='create-room.html'">+ สร้างห้องใหม่</button>
+        <button class="btn ghost" onclick="openJoin()">เข้าร่วมห้องด้วยโค้ด</button>
+      </div>
+    </div>
+    <div class="hero-card">
+      <h3>พร้อมสำหรับทีมของคุณ</h3>
+      <p>รองรับทั้ง “ห้องงาน” “โปรเจกต์” และ “เรียนรู้” จัดการสมาชิก สิทธิ์ และสื่อได้จากที่เดียว</p>
+    </div>
+  </section>
+
+  <section id="this-week" class="section">
+    <div class="pill-sec">This week</div>
+    <h2 style="margin-top:10px">กำหนดการสัปดาห์นี้</h2>
+    <div class="week-grid" id="weekGrid"></div>
+  </section>
+
+  <section class="section">
+    <h2>ห้องของคุณ</h2>
+    <div id="roomGrid" class="grid"></div>
+    <div id="roomEmpty" class="empty" style="display:none;">ยังไม่มีห้องที่คุณสร้าง/เข้าร่วม — ลองกด “+ สร้างห้องใหม่” หรือ “เข้าร่วมห้องด้วยโค้ด” ด้านบน</div>
+  </section>
+
+  <footer>
+    <div class="container">© 2025 SR WorkRoom • ทำงานง่ายขึ้นและร่วมกันได้ดีกว่าเดิม</div>
+  </footer>
+
+  <!-- Modal Join -->
+  <div id="joinModal" style="position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:70;">
+    <div style="width:100%; max-width:440px; background:linear-gradient(180deg,var(--surface-2),var(--surface)); border:1px solid var(--line); border-radius:16px; padding:20px;">
+      <h3 style="margin:0 0 10px">เข้าร่วมห้องด้วยโค้ด</h3>
+      <div class="field"><input id="joinCode" class="input" type="text" placeholder="เช่น ABC123" /></div>
+      <div class="row" style="margin-top:12px; justify-content:flex-end">
+        <button class="btn ghost" onclick="closeJoin()">ยกเลิก</button>
+        <button class="btn primary" onclick="joinLocal()">เข้าร่วม (แบบโลคัล)</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  /* ===== Utilities ===== */
+  const $ = id => document.getElementById(id);
+  const setVar = (k,v)=> document.documentElement.style.setProperty(k,v);
+  const normalize = s => (s||'').toString().trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+
+  /* ===== Drawer toggle ===== */
+  const drawer = $('drawer'), dim = $('drawerDim');
+  $('openDrawer').addEventListener('click', ()=> drawer.classList.add('open'));
+  $('closeDrawer').addEventListener('click', ()=> drawer.classList.remove('open'));
+  dim.addEventListener('click', ()=> drawer.classList.remove('open'));
+
+  /* ===== Logout ===== */
+  function logout(){
+    try{
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('lastRoom');
+    }catch(e){}
+    window.location.href = 'index.html';
+  }
+
+  /* ===== Profile state ===== */
+  const K_PROFILE = 'profile';
+  function loadProfile(){
+    try{
+      const p = JSON.parse(localStorage.getItem(K_PROFILE) || '{}');
+      if(p.name) $('displayName').value = p.name;
+      if(p.bio) $('bio').value = p.bio;
+      if(p.avatar) $('avatar').style.backgroundImage = `url('${p.avatar}')`;
+    }catch(e){}
+  }
+  function saveProfile(){
+    const name = $('displayName').value.trim();
+    const bio  = $('bio').value.trim();
+    const bg   = $('avatar').style.backgroundImage || '';
+    const avatar = bg.startsWith('url(') ? bg.slice(5,-2) : '';
+    localStorage.setItem(K_PROFILE, JSON.stringify({ name, bio, avatar }));
+    $('profileSaved').style.display = 'inline';
+    setTimeout(()=> $('profileSaved').style.display='none', 1200);
+  }
+  $('saveProfile').addEventListener('click', saveProfile);
+  $('avatarInput').addEventListener('change', (e)=>{
+    const f = e.target.files?.[0]; if(!f) return;
+    const r = new FileReader();
+    r.onload = ()=>{ $('avatar').style.backgroundImage = `url('${r.result}')`; };
+    r.readAsDataURL(f);
+  });
+  loadProfile();
+
+  /* ===== Theme (personalization) ===== */
+  const K_THEME = 'themePrefs';
+  function applyTheme(t){
+    if(!t) return;
+    if(t.accent) setVar('--accent', t.accent);
+    if(t.accent2) setVar('--accent-2', t.accent2);
+    if(t.radius) setVar('--radius', t.radius + 'px');
+    if(t.density) setVar('--density', t.density);
+    // sync controls
+    if($('accent')) $('accent').value = t.accent || '#00f2fe';
+    if($('accent2')) $('accent2').value = t.accent2 || '#8a2be2';
+    if($('radius')) $('radius').value = t.radius || 14;
+    if($('density')) $('density').value = t.density || 1;
+  }
+  function loadTheme(){
+    try{
+      const t = JSON.parse(localStorage.getItem(K_THEME) || '{}');
+      if(!t.accent) t.accent = '#00f2fe';
+      if(!t.accent2) t.accent2 = '#8a2be2';
+      if(!t.radius) t.radius = 14;
+      if(!t.density) t.density = 1;
+      applyTheme(t);
+    }catch(e){}
+  }
+  function currentThemeFromControls(){
+    return {
+      accent: $('accent').value,
+      accent2: $('accent2').value,
+      radius: parseInt($('radius').value,10),
+      density: parseFloat($('density').value)
+    };
+  }
+  function saveTheme(){
+    const t = currentThemeFromControls();
+    localStorage.setItem(K_THEME, JSON.stringify(t));
+    applyTheme(t);
+    $('themeSaved').style.display = 'inline';
+    setTimeout(()=> $('themeSaved').style.display='none', 1200);
+  }
+  function resetTheme(){
+    const t = { accent:'#00f2fe', accent2:'#8a2be2', radius:14, density:1 };
+    localStorage.setItem(K_THEME, JSON.stringify(t));
+    applyTheme(t);
+  }
+  $('saveTheme').addEventListener('click', saveTheme);
+  $('resetTheme').addEventListener('click', resetTheme);
+  loadTheme();
+
+  /* ===== Join (local) เดิม ===== */
+  function openJoin(){ $('joinModal').style.display='flex'; $('joinCode').value=''; setTimeout(()=>$('joinCode').focus(),50); }
+  function closeJoin(){ $('joinModal').style.display='none'; }
+  function joinLocal(){
+    const code = normalize($('joinCode').value);
+    if(!code){ alert('กรอกโค้ดก่อน'); return; }
+    const rooms = JSON.parse(localStorage.getItem('rooms')||'[]');
+    const found = rooms.find(r => normalize(r.code)===code);
+    if(!found){ alert('ไม่พบห้องบนเครื่องนี้'); return; }
+    localStorage.setItem('lastRoom', JSON.stringify({ ...found, role:'member' }));
+    closeJoin();
+    location.href = 'room.html';
+  }
+  window.openJoin = openJoin;
+  window.closeJoin = closeJoin;
+  window.joinLocal = joinLocal;
+
+  /* ===== Rooms render (เดิม) ===== */
+  const roomGrid = $('roomGrid');
+  const roomEmpty = $('roomEmpty');
+  const rooms = JSON.parse(localStorage.getItem('rooms')) || [];
+  if(rooms.length === 0){
+    roomEmpty.style.display = 'block';
+  }else{
+    roomGrid.innerHTML = rooms.map((r,idx)=> `
+      <div class="card room" onclick="openRoom(${idx})">
+        <h3>${r.name}</h3>
+        <p>${r.detail || 'ไม่มีรายละเอียด'}</p>
+        <span class="tag">${r.type || 'ทั่วไป'}</span>
+      </div>
+    `).join('');
+  }
+  function openRoom(index){
+    const selected = rooms[index];
+    const currentUser = localStorage.getItem('currentUser') || 'me';
+    const K_MEMBERS = `members_${selected.name}`;
+    const members = JSON.parse(localStorage.getItem(K_MEMBERS) || '[]');
+    const me = members.find(m=>m.name===currentUser);
+    const role = (me && me.role) || (selected.createdBy===currentUser ? 'host' : 'member');
+    localStorage.setItem('lastRoom', JSON.stringify({...selected, role}));
+    window.location.href = 'room.html';
+  }
+  window.openRoom = openRoom;
+
+  /* ===== This week (เดิม) ===== */
+  const weekGrid = $('weekGrid');
+  function isThisWeek(dateStr){
+    if(!dateStr) return false;
+    const d = new Date(dateStr);
+    if(isNaN(d)) return false;
+    const now = new Date();
+    const start = new Date(now);
+    start.setDate(now.getDate() - now.getDay()); // อาทิตย์เป็นวันแรก
+    start.setHours(0,0,0,0);
+    const end = new Date(start); end.setDate(start.getDate() + 7);
+    return d >= start && d < end;
+  }
+  function collectThisWeek(){
+    const items = [];
+    Object.keys(localStorage).forEach(key=>{
+      if(key.startsWith('assignments_')){
+        const roomName = key.replace('assignments_','');
+        try{
+          const arr = JSON.parse(localStorage.getItem(key) || '[]');
+          arr.forEach(a=>{
+            if(a && a.due && isThisWeek(a.due)){
+              items.push({type:'deadline', title:a.title||'(ไม่มีชื่อ)', date:a.due, room:roomName});
+            }
+          });
+        }catch(e){}
+      }
+    });
+    Object.keys(localStorage).forEach(key=>{
+      if(key.startsWith('events_')){
+        const roomName = key.replace('events_','');
+        try{
+          const arr = JSON.parse(localStorage.getItem(key) || '[]');
+          arr.forEach(ev=>{
+            if(ev && ev.date && isThisWeek(ev.date)){
+              items.push({type:'event', title:ev.title||'(Event)', date:ev.date, room:roomName});
+            }
+          });
+        }catch(e){}
+      }
+    });
+    items.sort((a,b)=> new Date(a.date) - new Date(b.date));
+    return items;
+  }
+  function renderThisWeek(){
+    const items = collectThisWeek();
+    if(items.length === 0){
+      weekGrid.innerHTML = `
+        <div class="week">
+          <strong>ยังไม่มีกำหนดการในสัปดาห์นี้</strong>
+          <div class="muted">เมื่อมีงาน/อีเวนต์พร้อมวันที่ ระบบจะดึงมาแสดงอัตโนมัติ</div>
+        </div>`;
+      return;
+    }
+    weekGrid.innerHTML = items.map(it => `
+      <div class="week">
+        <strong>${it.type==='deadline' ? '📌 กำหนดส่ง' : '📅 อีเวนต์'} — ${it.title}</strong>
+        <div class="muted">ห้อง: ${it.room || '-'}</div>
+        <div class="muted">วันที่: ${it.date}</div>
+      </div>
+    `).join('');
+  }
+  renderThisWeek();
+</script>
+</body>
+</html>

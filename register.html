@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>SR WorkRoom • สมัครสมาชิก</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b0c10; --surface:#121317; --surface-2:#17181e;
+      --text:#fff; --sub:#cfd3da; --accent:#00f2fe; --accent-2:#8a2be2;
+      --line:#242836; --glow:0 0 30px rgba(0,242,254,.25); --radius:14px; --ok:#00e5a8; --warn:#ff6b6b;
+    }
+    *{box-sizing:border-box} html,body{margin:0}
+    body{
+      font-family:'Prompt',sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, #1b2b34 0%, transparent 60%),
+                  radial-gradient(900px 600px at 100% 0%, #241b3a 0%, transparent 55%),
+                  var(--bg);
+      color:var(--text); min-height:100vh; display:flex; flex-direction:column;
+    }
+    /* Top nav */
+    .nav{position:sticky; top:0; z-index:50; backdrop-filter:blur(8px);
+      background:linear-gradient(180deg,rgba(15,15,18,.85),rgba(15,15,18,.55));
+      border-bottom:1px solid #22262e;}
+    .nav-wrap{max-width:1200px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+    .badge{border:2px solid var(--accent);border-radius:10px;padding:6px 10px;background:linear-gradient(90deg,#00f2fe22,#8a2be222);box-shadow:var(--glow)}
+    .btn{appearance:none;border:none;cursor:pointer;font-weight:600;padding:10px 16px;border-radius:10px;transition:.25s}
+    .btn.ghost{background:transparent;color:var(--sub);border:1px solid #2a2f38}
+    .btn.ghost:hover{border-color:#3a404b;color:#fff}
+    .btn.primary{color:#000;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+    .btn.ok{color:#000;background:linear-gradient(90deg,var(--ok),#66ffd1)}
+
+    /* Form card */
+    .wrap{flex:1;display:grid;place-items:center;padding:36px 16px}
+    .card{
+      width:100%;max-width:460px;background:linear-gradient(180deg,var(--surface-2),var(--surface));
+      border:1px solid var(--line);border-radius:var(--radius);padding:24px 22px;box-shadow:0 20px 40px rgba(0,0,0,.35)
+    }
+    h1{margin:0 0 8px;font-size:26px}
+    p.muted{margin:0 0 18px;color:#aeb4bf}
+    .field{margin-bottom:14px}
+    label{display:block;margin-bottom:6px;font-weight:600}
+    input[type="text"],input[type="password"]{
+      width:100%;padding:12px;border-radius:10px;border:1px solid #2b2f39;background:#131722;color:#fff
+    }
+    .hint{font-size:12px;color:#9aa3b2;margin-top:6px}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .error{background:#2a1316;border:1px solid #70343a;color:#ffb4b4;padding:10px;border-radius:10px;margin-bottom:12px;display:none}
+    .okmsg{background:#0f2a21;border:1px solid #2e6b55;color:#b9ffdf;padding:10px;border-radius:10px;margin-bottom:12px;display:none}
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-wrap">
+      <div class="badge">SR WorkRoom</div>
+      <div>
+        <button class="btn ghost" onclick="location.href='index.html'">หน้าแรก</button>
+        <button class="btn ghost" onclick="location.href='login.html'">เข้าสู่ระบบ</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="card">
+      <h1>สมัครสมาชิก</h1>
+      <p class="muted">ตั้งชื่อผู้ใช้และรหัสผ่านของคุณ (ไม่ใช้อีเมล)</p>
+
+      <div id="err" class="error"></div>
+      <div id="ok" class="okmsg"></div>
+
+      <div class="field">
+        <label for="username">ชื่อผู้ใช้</label>
+        <input id="username" type="text" placeholder="ตัวอย่างเช่น somchai01" autocomplete="username">
+        <div class="hint">ใช้ a-z, 0-9, ขีดล่าง (_), ยาว 3–20 ตัวอักษร</div>
+      </div>
+
+      <div class="field">
+        <label for="password">รหัสผ่าน</label>
+        <input id="password" type="password" placeholder="อย่างน้อย 6 ตัวอักษร" autocomplete="new-password">
+        <div class="hint"><label><input type="checkbox" id="showPass"> แสดงรหัสผ่าน</label></div>
+      </div>
+
+      <div class="field">
+        <label for="password2">ยืนยันรหัสผ่าน</label>
+        <input id="password2" type="password" placeholder="พิมพ์รหัสผ่านอีกครั้ง" autocomplete="new-password">
+      </div>
+
+      <div class="row">
+        <button class="btn primary" id="registerBtn">สมัครสมาชิก</button>
+        <button class="btn ghost" onclick="location.href='login.html'">มีบัญชีแล้ว? เข้าสู่ระบบ</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    $('showPass').addEventListener('change', e=>{
+      $('password').type = e.target.checked ? 'text' : 'password';
+      $('password2').type = e.target.checked ? 'text' : 'password';
+    });
+
+    $('registerBtn').addEventListener('click', ()=>{
+      hideErr(); hideOk();
+      const u = $('username').value.trim();
+      const p1 = $('password').value, p2 = $('password2').value;
+
+      if(!/^[a-z0-9_]{3,20}$/i.test(u)) return showErr('รูปแบบชื่อผู้ใช้ไม่ถูกต้อง (ใช้อักษร/ตัวเลข/_ 3–20 ตัว)');
+      if(p1.length < 6) return showErr('รหัสผ่านสั้นเกินไป (อย่างน้อย 6 ตัว)');
+      if(p1 !== p2) return showErr('รหัสผ่านไม่ตรงกัน');
+
+      const users = JSON.parse(localStorage.getItem('users')||'[]');
+      if(users.find(x=>x.username.toLowerCase() === u.toLowerCase())){
+        return showErr('มีชื่อผู้ใช้นี้อยู่แล้ว');
+      }
+
+      users.push({username:u, password:p1});
+      localStorage.setItem('users', JSON.stringify(users));
+      localStorage.setItem('currentUser', u);
+
+      showOk('สมัครสมาชิกสำเร็จ! กำลังพาไปแดชบอร์ด…');
+      setTimeout(()=> location.href='dashboard.html', 700);
+    });
+
+    function showErr(msg){ const b=$('err'); b.textContent=msg; b.style.display='block'; }
+    function hideErr(){ $('err').style.display='none'; }
+    function showOk(msg){ const b=$('ok'); b.textContent=msg; b.style.display='block'; }
+    function hideOk(){ $('ok').style.display='none'; }
+  </script>
+</body>
+</html>

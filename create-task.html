@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>SR WorkRoom • สร้างงาน</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b0c10; --surface:#121317; --surface-2:#17181e;
+      --text:#fff; --sub:#cfd3da; --accent:#00f2fe; --accent-2:#8a2be2;
+      --ok:#00e5a8; --warn:#ff6b6b; --line:#242836; --glow:0 0 30px rgba(0,242,254,.25); --radius:14px;
+    }
+    *{box-sizing:border-box} html,body{margin:0}
+    body{
+      font-family:'Prompt',sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, #1b2b34 0%, transparent 60%),
+                  radial-gradient(900px 600px at 100% 0%, #241b3a 0%, transparent 55%),
+                  var(--bg);
+      color:var(--text); min-height:100vh; display:flex; flex-direction:column;
+    }
+
+    /* Top nav */
+    .nav{position:sticky; top:0; z-index:50; backdrop-filter:blur(8px);
+      background:linear-gradient(180deg,rgba(15,15,18,.85),rgba(15,15,18,.55)); border-bottom:1px solid #22262e;}
+    .nav-wrap{max-width:1200px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+    .badge{border:2px solid var(--accent);border-radius:10px;padding:6px 10px;background:linear-gradient(90deg,#00f2fe22,#8a2be222);box-shadow:var(--glow)}
+    .btn{appearance:none;border:none;cursor:pointer;font-weight:600;padding:10px 16px;border-radius:10px;transition:.25s}
+    .btn.ghost{background:transparent;color:var(--sub);border:1px solid #2a2f38}
+    .btn.ghost:hover{border-color:#3a404b;color:#fff}
+    .btn.primary{color:#000;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+    .btn.warn{background:var(--warn); color:#000}
+
+    /* Form card */
+    .wrap{flex:1;display:grid;place-items:center;padding:40px 16px}
+    .card{
+      width:100%;max-width:720px;background:linear-gradient(180deg,var(--surface-2),var(--surface));
+      border:1px solid var(--line);border-radius:var(--radius);padding:24px 22px;box-shadow:0 20px 40px rgba(0,0,0,.35)
+    }
+    h1{margin:0 0 8px;font-size:26px}
+    p.muted{margin:0 0 18px;color:#aeb4bf}
+    .grid{display:grid;gap:14px;grid-template-columns:1fr}
+    @media(min-width:900px){.grid{grid-template-columns:1fr 1fr}}
+    .field{margin-bottom:10px}
+    label{display:block;margin-bottom:6px;font-weight:600}
+    input[type="text"], input[type="date"], textarea, select{
+      width:100%;padding:12px;border-radius:10px;border:1px solid #2b2f39;background:#131722;color:#fff
+    }
+    textarea{min-height:120px}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .hint{font-size:12px;color:#9aa3b2;margin-top:6px}
+    .error{background:#2a1316;border:1px solid #70343a;color:#ffb4b4;padding:10px;border-radius:10px;margin-bottom:12px;display:none}
+    .okmsg{background:#0f2a21;border:1px solid #2e6b55;color:#b9ffdf;padding:10px;border-radius:10px;margin-bottom:12px;display:none}
+  </style>
+</head>
+<body>
+  <!-- Top nav -->
+  <header class="nav">
+    <div class="nav-wrap">
+      <div class="badge">SR WorkRoom</div>
+      <div>
+        <button class="btn ghost" onclick="location.href='room.html'">กลับห้อง</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="card">
+      <h1>สร้างงานใหม่</h1>
+      <p class="muted">ตั้งชื่องาน รายละเอียด กำหนดส่ง และตัวเลือกอื่น ๆ — งานจะถูกบันทึกลงในห้องล่าสุดของคุณ</p>
+
+      <div id="err" class="error"></div>
+      <div id="ok" class="okmsg"></div>
+
+      <div class="field">
+        <label>ห้อง</label>
+        <input id="roomName" type="text" disabled>
+        <div class="hint">ระบบเลือกจากห้องล่าสุดที่คุณเปิด (lastRoom)</div>
+      </div>
+
+      <div class="grid">
+        <div>
+          <div class="field">
+            <label for="aTitle">ชื่องาน *</label>
+            <input id="aTitle" type="text" placeholder="เช่น รายงานบทที่ 1 / Weekly Sprint Review">
+          </div>
+          <div class="field">
+            <label for="aDetail">รายละเอียดงาน *</label>
+            <textarea id="aDetail" placeholder="อธิบายสิ่งที่ต้องทำ เกณฑ์การให้คะแนน รูปแบบไฟล์ ฯลฯ"></textarea>
+          </div>
+        </div>
+
+        <div>
+          <div class="row">
+            <div class="field" style="flex:1;min-width:180px">
+              <label for="aDue">กำหนดส่ง *</label>
+              <input id="aDue" type="date">
+            </div>
+            <div class="field" style="flex:1;min-width:140px">
+              <label for="aPoints">คะแนนเต็ม</label>
+              <input id="aPoints" type="text" placeholder="100">
+            </div>
+          </div>
+          <div class="row">
+            <div class="field" style="flex:1">
+              <label for="aTopic">หัวข้อ</label>
+              <input id="aTopic" type="text" placeholder="เช่น Week 1 / Module A">
+            </div>
+            <div class="field" style="flex:1">
+              <label for="aAttach">แนบลิงก์ไฟล์ (URL)</label>
+              <input id="aAttach" type="text" placeholder="เช่น https://drive.google.com/…">
+            </div>
+          </div>
+          <div class="hint">* จำเป็นต้องกรอก</div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:8px">
+        <button class="btn primary" id="createBtn">สร้างงาน</button>
+        <button class="btn ghost" onclick="location.href='room.html'">ยกเลิก</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const $ = id => document.getElementById(id);
+
+    // โหลดห้องล่าสุด & ตรวจสิทธิ์
+    const lastRoom = JSON.parse(localStorage.getItem('lastRoom')||'null');
+    if(!lastRoom){
+      alert('ไม่พบห้องล่าสุด กรุณาเข้าไปเลือกห้องก่อน');
+      location.href = 'dashboard.html';
+    }
+    $('roomName').value = `${lastRoom?.name || '-'}`;
+    if(lastRoom.role !== 'host'){
+      showErr('หน้านี้สำหรับ Host เท่านั้น คุณไม่มีสิทธิ์สร้างงาน'); // แสดงข้อความ
+      $('createBtn').disabled = true; // ปิดปุ่ม
+    }
+
+    // ตั้งค่า min วันกำหนดส่งเป็นวันนี้
+    const today = new Date().toISOString().slice(0,10);
+    $('aDue').setAttribute('min', today);
+
+    $('createBtn').addEventListener('click', ()=>{
+      hideErr(); hideOk();
+      if(lastRoom.role !== 'host'){
+        return showErr('สิทธิ์ไม่พอ: เฉพาะ Host เท่านั้นที่สามารถสร้างงานได้');
+      }
+
+      const title = $('aTitle').value.trim();
+      const detail= $('aDetail').value.trim();
+      const due   = $('aDue').value;
+      const points= $('aPoints').value.trim() || '100';
+      const topic = $('aTopic').value.trim();
+      const attach= $('aAttach').value.trim();
+
+      if(!title || !detail || !due){
+        return showErr('กรุณากรอก ชื่องาน / รายละเอียด / กำหนดส่ง');
+      }
+
+      const keyAssign = `assignments_${lastRoom.name}`;
+      const list = JSON.parse(localStorage.getItem(keyAssign) || '[]');
+
+      const assignment = {
+        id: `a_${Date.now()}`,
+        title, detail, due, points, topic,
+        attachments: attach ? [attach] : [],
+        createdAt: new Date().toISOString()
+      };
+
+      list.push(assignment);
+      localStorage.setItem(keyAssign, JSON.stringify(list));
+
+      // ผูกเข้าปฏิทินของห้องด้วย
+      const keyEvents = `events_${lastRoom.name}`;
+      const events = JSON.parse(localStorage.getItem(keyEvents) || '[]');
+      events.push({ id:`e_${Date.now()}`, title:`กำหนดส่ง: ${title}`, date: due });
+      localStorage.setItem(keyEvents, JSON.stringify(events));
+
+      showOk('สร้างงานสำเร็จ! กำลังพากลับไปยังห้อง…');
+      setTimeout(()=> location.href='room.html', 700);
+    });
+
+    function showErr(msg){ const box=$('err'); box.textContent=msg; box.style.display='block'; }
+    function hideErr(){ $('err').style.display='none'; }
+    function showOk(msg){ const box=$('ok'); box.textContent=msg; box.style.display='block'; }
+    function hideOk(){ $('ok').style.display='none'; }
+  </script>
+  <script type="module" src="firebase.js"></script>
+  <script type="module">
+    import { db, auth, collection, addDoc, serverTimestamp } from './firebase.js';
+    // เพิ่มฟังก์ชัน Firestore
+  </script>
+</body>
+</html>
